@@ -6,7 +6,13 @@ public class PlayerController : MonoBehaviour
 {
     private Rigidbody _playerRB;
     private CapsuleCollider _playerCollider;
-    private bool _canJump = false;
+    [SerializeField]
+    private Transform _cameraRotationTransform;
+
+    public bool _canJump = false;
+    public bool _canMove = false;
+    [SerializeField]
+    private float _moveSpeed = 3.0f;
     private float _elapsedJumpTime = 0f;
     [SerializeField]
     private float _coyoteTime = 0.2f;
@@ -29,11 +35,19 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         GetInput();
+        
+        transform.Rotate(new Vector3(0f, _rotationHorizontalInput, 0f));
+        _cameraRotationTransform.Rotate(new Vector3(_rotationVerticalInput, 0f, 0f), Space.Self);
 
-        //  Rotate
-        //  Move
+        CheckAbleToJumpAndMove();
+        
+        if (_canMove == true)
+        {
+            _playerRB.AddRelativeForce(new Vector3(_horizontalInput, 0f, _verticalInput) * Time.deltaTime * _moveSpeed, ForceMode.VelocityChange);
+            //transform.Translate(new Vector3(_horizontalInput, 0f, _verticalInput) * Time.deltaTime, Space.Self);
 
-        CheckAbleToJump();
+        }
+
         if (Input.GetKeyDown(KeyCode.Space) && _canJump == true)
         {
             _playerRB.velocity = new Vector3(_playerRB.velocity.x, _jumpSpeed, _playerRB.velocity.z);
@@ -48,17 +62,21 @@ public class PlayerController : MonoBehaviour
         _rotationVerticalInput = Input.GetAxis("Mouse Y");
     }
 
-    private void CheckAbleToJump ()
+    private void CheckAbleToJumpAndMove ()
     {
-        Vector3 bottom = new Vector3(_playerCollider.bounds.center.x, _playerCollider.bounds.min.y - 0.1f, _playerCollider.bounds.center.z);
+        Vector3 bottom = new Vector3(_playerCollider.bounds.center.x, _playerCollider.bounds.min.y + _playerCollider.radius - 0.1f, _playerCollider.bounds.center.z);
+        LayerMask mask = LayerMask.GetMask("Default");
 
-        //  Check if the bottom of the collider is touching something
-        if (Physics.CheckCapsule(_playerCollider.bounds.center, bottom, _playerCollider.radius) == true)
+        //  Check if the bottom of the collider is touching something in the default layer
+        if (Physics.CheckCapsule(_playerCollider.bounds.center, bottom, _playerCollider.radius, mask) == true)
         {
             _canJump = true;
+            _canMove = true;
             _elapsedJumpTime = 0f;
             return;
         }
+
+        _canMove = false;
 
         //  If we are not touching something, but we were before, activate coyote time
         if (_canJump == true)
