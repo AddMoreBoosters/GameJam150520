@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && _canJump == true)
         {
-            _playerRB.velocity = new Vector3(_playerRB.velocity.x, _jumpSpeed, _playerRB.velocity.z);
+            Jump();
         }
     }
 
@@ -78,5 +78,10 @@ public class PlayerController : MonoBehaviour
 
             _elapsedJumpTime += Time.deltaTime;
         }
+    }
+
+    public void Jump ()
+    {
+        _playerRB.velocity = new Vector3(_playerRB.velocity.x, _jumpSpeed, _playerRB.velocity.z);
     }
 }
