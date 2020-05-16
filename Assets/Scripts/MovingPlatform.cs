@@ -45,4 +45,20 @@ public class MovingPlatform : MonoBehaviour
     {
         transform.position = Vector3.Lerp(_position1, _position2, _position);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.CompareTag("Player"))
+        {
+            collision.transform.SetParent(transform);
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.transform.CompareTag("Player"))
+        {
+            collision.transform.SetParent(null);
+        }
+    }
 }

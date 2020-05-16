@@ -35,14 +35,18 @@ public class PlayerController : MonoBehaviour
         GetInput();
 
         CheckAbleToJumpAndMove();
-
-        //_playerRB.AddRelativeForce(new Vector3(_horizontalInput, 0f, 0f) * Time.deltaTime * _moveSpeed, ForceMode.VelocityChange);
-        transform.Translate(new Vector3(_horizontalInput, 0f, 0f) * Time.deltaTime * _moveSpeed);
+        
+        //transform.Translate(new Vector3(_horizontalInput, 0f, 0f) * Time.deltaTime * _moveSpeed);
 
         if (Input.GetKeyDown(KeyCode.Space) && _canJump == true)
         {
             _playerRB.velocity = new Vector3(_playerRB.velocity.x, _jumpSpeed, _playerRB.velocity.z);
         }
+    }
+
+    private void FixedUpdate()
+    {
+        transform.Translate(new Vector3(_horizontalInput, 0f, 0f) * Time.fixedDeltaTime * _moveSpeed);
     }
 
     private void GetInput ()
@@ -56,7 +60,7 @@ public class PlayerController : MonoBehaviour
         LayerMask mask = LayerMask.GetMask("Default");
 
         //  Check if the bottom of the collider is touching something in the default layer
-        if (Physics.CheckCapsule(_playerCollider.bounds.center, bottom, _playerCollider.radius, mask) == true)
+        if (Physics.CheckCapsule(_playerCollider.bounds.center, bottom, _playerCollider.radius * 0.9f, mask) == true)
         {
             _canJump = true;
             _elapsedJumpTime = 0f;
