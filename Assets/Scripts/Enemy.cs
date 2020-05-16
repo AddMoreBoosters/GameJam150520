@@ -4,16 +4,13 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private float _moveSpeed = 1f;
+    private float _direction = 1f;
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        
+        transform.Translate(transform.right * Time.fixedDeltaTime * _moveSpeed * _direction);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -21,6 +18,7 @@ public class Enemy : MonoBehaviour
         if (!collision.transform.CompareTag("Player"))
         {
             //  Not the player, just turn around
+            _direction *= -1f;
         }
 
         //  Hit the player, it's game over
