@@ -19,9 +19,11 @@ public class Enemy : MonoBehaviour
         {
             //  Not the player, just turn around
             _direction *= -1f;
+            return;
         }
 
         //  Hit the player, it's game over
+        GameController.Instance.GameOver();
     }
 
     private void OnTriggerEnter(Collider other)

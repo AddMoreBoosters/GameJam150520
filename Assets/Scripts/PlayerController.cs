@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody _playerRB;
     private CapsuleCollider _playerCollider;
 
+    private bool _controlsEnabled = true;
+
     public bool _canJump = false;
     [SerializeField]
     private float _moveSpeed = 3.0f;
@@ -32,9 +34,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (_controlsEnabled == false)
+        {
+            return;
+        }
+
         GetInput();
 
-        CheckAbleToJumpAndMove();
+        CheckAbleToJump();
         
         //transform.Translate(new Vector3(_horizontalInput, 0f, 0f) * Time.deltaTime * _moveSpeed);
 
@@ -46,6 +53,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (_controlsEnabled == false)
+        {
+            return;
+        }
+
         transform.Translate(new Vector3(_horizontalInput, 0f, 0f) * Time.fixedDeltaTime * _moveSpeed);
     }
 
@@ -54,7 +66,7 @@ public class PlayerController : MonoBehaviour
         _horizontalInput = Input.GetAxis("Horizontal");
     }
 
-    private void CheckAbleToJumpAndMove ()
+    private void CheckAbleToJump ()
     {
         Vector3 bottom = new Vector3(_playerCollider.bounds.center.x, _playerCollider.bounds.min.y + _playerCollider.radius - 0.1f, _playerCollider.bounds.center.z);
         LayerMask mask = LayerMask.GetMask("Default");
@@ -83,5 +95,31 @@ public class PlayerController : MonoBehaviour
     public void Jump ()
     {
         _playerRB.velocity = new Vector3(_playerRB.velocity.x, _jumpSpeed, _playerRB.velocity.z);
+    }
+
+    public void SetControlsEnabled (bool enabled)
+    {
+        _controlsEnabled = enabled;
+    }
+
+    /// <summary>
+    /// Disables controls and collider, cancels velocity, and optionally
+    /// jumps as a stand-in for a proper death animation.
+    /// 
+    /// Note that the camera's followPlayer must be disabled separately if
+    /// that is desired.
+    /// </summary>
+    /// <param name="shouldJump"></param>
+    public void Die (bool shouldJump = false)
+    {
+        _playerCollider.enabled = false;
+        SetControlsEnabled(false);
+
+        _playerRB.velocity = Vector3.zero;
+        
+        if (shouldJump == true)
+        {
+            Jump();
+        }
     }
 }
